@@ -25,6 +25,7 @@ const secret_key = process.env.SECRET;
 
 server.get('/', (req, res) => {
     // Return a response that documents the other routes/operations available
+
     res.send(`
     <html>
       <header><title>Secret Gists!</title></header>
@@ -164,7 +165,7 @@ server.post('/createsecret', urlencodedParser, (req, res) => {
     const ciphertext = nacl.secretbox(nacl.util.decodeUTF8(content), nonce, nacl.util.decodeBase64(secret_key));
 
     const blob = nacl.util.encodeBase64(nonce) + nacl.util.encodeBase64(ciphertext);
-    const files = { [name]: { content } };
+    const files = { [name]: { content: blob } };
     github.gists
         .create({ files, public: false })
         .then(response => {
@@ -310,6 +311,8 @@ server.get('/fetchgistfromfriend/', urlencodedParser, (req, res) => {
         `);
       }
 
+    }).catch(err => {
+      res.send(500).json(err);
     });
 
   });
